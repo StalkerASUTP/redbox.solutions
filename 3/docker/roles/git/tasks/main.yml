@@ -1,5 +1,0 @@
----
-- name: Склонировать репзиторий
-  ansible.builtin.apt:
-  name: docker
-  state: present

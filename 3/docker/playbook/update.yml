@@ -1,8 +1,59 @@
 ---
-- name: Обновление пакета
+- name: Docker-compose проект
   hosts: all
-  become: true # Получение права root
-  roles:
-    - update-packages
-    - docker
-    - git
+  become: yes
+  vars:
+    
+    git_repo_url: "https://github.com/StalkerASUTP/redbox.solutions"
+    project_dir: "/opt/project"
+    
+  tasks:
+    - name: Обновить пакеты
+      apt:
+        update_cache: yes
+        
+    - name: Установка зависимостей
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+        
+    - name: Добавить ключ Docker GPG
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        
+    - name: Добавить Docker repository
+      apt_repository:
+        repo: "deb https://download.docker.com/linux/ubuntu focal stable"
+        
+    - name: Установить Docker
+      apt:
+        name: docker-ce
+        state: present
+        update_cache: yes
+        
+    - name: Запустить Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+        
+    - name: Установка Docker Compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64"
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+  
+    - name: Клонирование репозитория
+      git:
+        repo: "{{ git_repo_url }}"
+        dest: "{{ project_dir }}"
+        force: yes
+        
+    - name: Запуск проекта
+      shell: docker-compose up -d
+      args:
+        chdir: "{{ project_dir }}/redbox.solutions/1"

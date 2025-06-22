@@ -1,5 +1,0 @@
----
-- name: Обновить все пакеты через APT
-  ansible.builtin.apt:
-  upgrade: yes
-  update_cache: yes
