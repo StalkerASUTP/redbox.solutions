@@ -1,0 +1,8 @@
+---
+- name: Обновление пакета
+  hosts: all
+  become: true # Получение права root
+  roles:
+    - update-packages
+    - docker
+    - git
